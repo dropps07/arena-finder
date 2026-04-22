@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.arenafinder</groupId>
+        <artifactId>arena-finder</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>api-gateway</artifactId>
+    <n>API Gateway</n>
+
+    <dependencies>
+
+        <!--
+            WHY spring-cloud-starter-gateway and NOT spring-boot-starter-web?
+            ───────────────────────────────────────────────────────────────────
+            Spring Cloud Gateway is REACTIVE — it uses Project Reactor (WebFlux)
+            under the hood to handle thousands of concurrent connections
+            without blocking threads. The regular spring-boot-starter-web
+            uses blocking Tomcat — wrong fit for a proxy/gateway.
+
+            If you accidentally add spring-boot-starter-web here,
+            Spring Boot will throw a conflict error on startup.
+        -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- WebFlux version of OpenAPI docs -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

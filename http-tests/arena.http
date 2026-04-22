@@ -1,0 +1,74 @@
+# ═══════════════════════════════════════════════════════════════
+#  ARENA SERVICE — HTTP Tests
+# ═══════════════════════════════════════════════════════════════
+
+@baseUrl = http://localhost:8080
+@token = PASTE_YOUR_TOKEN_HERE
+
+###
+
+# ── Test 1: Get all arenas (public) ──────────────────────────
+GET {{baseUrl}}/arenas
+
+###
+
+# ── Test 2: Search by sport ───────────────────────────────────
+GET {{baseUrl}}/arenas?sport=FOOTBALL
+
+###
+
+# ── Test 3: Search nearby (lat/lng/radius) ────────────────────
+# Coordinates: Varanasi, India
+# Expected: arenas within 10km radius
+GET {{baseUrl}}/arenas/nearby?lat=25.3176&lng=82.9739&radiusKm=10&sport=FOOTBALL
+
+###
+
+# ── Test 4: Get single arena ──────────────────────────────────
+GET {{baseUrl}}/arenas/1
+
+###
+
+# ── Test 5: Create arena (requires auth) ─────────────────────
+# Expected: 201 Created
+POST {{baseUrl}}/arenas
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Champions Turf",
+  "address": "Lanka, Varanasi, UP",
+  "latitude": 25.3176,
+  "longitude": 82.9739,
+  "sports": ["FOOTBALL", "BADMINTON"],
+  "openTime": "06:00",
+  "closeTime": "22:00",
+  "pricePerHour": 500
+}
+
+###
+
+# ── Test 6: Create arena without auth ────────────────────────
+# Expected: 401 Unauthorized (Gateway blocks it)
+POST {{baseUrl}}/arenas
+Content-Type: application/json
+
+{
+  "name": "Should Not Work"
+}
+
+###
+
+# ── Test 7: Create arena with invalid data ────────────────────
+# Expected: 400 Bad Request (validation errors)
+POST {{baseUrl}}/arenas
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "",
+  "latitude": 999,
+  "longitude": 999
+}
+
+###

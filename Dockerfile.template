@@ -1,0 +1,55 @@
+# ═══════════════════════════════════════════════════════════════
+#  MULTI-STAGE DOCKERFILE  (same pattern for every service)
+#
+#  WHY MULTI-STAGE?
+#  ─────────────────
+#  Stage 1 (builder): has Maven + JDK installed. Compiles code.
+#  Stage 2 (runtime): has only JRE. Copies the JAR from stage 1.
+#
+#  Result: the final image has NO Maven, NO source code, NO build tools.
+#  A full Maven image is ~500MB. A JRE-only image is ~200MB.
+#  Smaller image = faster deploys, smaller attack surface.
+# ═══════════════════════════════════════════════════════════════
+
+# ── STAGE 1: Build ──────────────────────────────────────────────
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+WORKDIR /app
+
+# Copy parent pom first (for dependency caching)
+# Docker caches each layer. If pom.xml hasn't changed,
+# it reuses the cached layer and skips re-downloading dependencies.
+# This makes rebuilds after code-only changes much faster.
+COPY pom.xml .
+COPY src ./src
+
+# Build the JAR, skip tests (tests run in CI pipeline, not here)
+RUN ./mvnw clean package -DskipTests 2>/dev/null || \
+    (mvn clean package -DskipTests)
+
+# ── STAGE 2: Runtime ────────────────────────────────────────────
+FROM eclipse-temurin:21-jre-alpine AS runtime
+
+WORKDIR /app
+
+# Create a non-root user — security best practice
+# Running as root inside a container is a vulnerability
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+# Copy only the JAR from the build stage
+COPY --from=builder /app/target/*.jar app.jar
+
+# Document which port this service uses (doesn't actually expose it —
+# that's docker-compose's job — but it's good documentation)
+EXPOSE 8080
+
+# JVM flags explained:
+# -XX:+UseContainerSupport      → JVM respects Docker memory limits (default in Java 11+)
+# -XX:MaxRAMPercentage=75.0     → use 75% of container memory for heap
+# -Djava.security.egd=...       → faster startup (avoids entropy blocking)
+ENTRYPOINT ["java", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]

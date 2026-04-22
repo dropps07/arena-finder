@@ -1,0 +1,250 @@
+
+# ═══════════════════════════════════════════════════════════════════
+#  ARENA FINDER — LOCAL DEVELOPMENT ENVIRONMENT
+#  docker-compose up --build   → starts everything
+#  docker-compose down -v      → stops + wipes all data volumes
+# ═══════════════════════════════════════════════════════════════════
+#
+#  HOW SERVICES TALK TO EACH OTHER (important mental model):
+#  ──────────────────────────────────────────────────────────
+#  From your laptop browser  → use localhost:<port>
+#  From inside a container   → use the service NAME (e.g. auth-db, kafka)
+#  Why? Docker creates an internal DNS where container names = hostnames.
+#  That's why DB_URL = jdbc:postgresql://auth-db:5432  not localhost:5432
+
+services:
+
+  # ─────────────────────────────────────────────────
+  #  DATABASES — one per service (microservice rule:
+  #  no service reads another service's database)
+  # ─────────────────────────────────────────────────
+
+  auth-db:
+    image: postgres:16-alpine
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    ports:
+      - "5433:5432"   # host:container — 5433 so it doesn't clash with a local postgres
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data   # data survives container restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  arena-db:
+    image: postgres:16-alpine
+    container_name: arena-db
+    environment:
+      POSTGRES_DB: arena_db
+      POSTGRES_USER: arena_user
+      POSTGRES_PASSWORD: arena_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - arena-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arena_user -d arena_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  booking-db:
+    image: postgres:16-alpine
+    container_name: booking-db
+    environment:
+      POSTGRES_DB: booking_db
+      POSTGRES_USER: booking_user
+      POSTGRES_PASSWORD: booking_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - booking-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booking_user -d booking_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────────
+  #  KAFKA — async message broker
+  #
+  #  KRaft mode = Kafka without ZooKeeper (simpler setup,
+  #  modern approach as of Kafka 3.x)
+  # ─────────────────────────────────────────────────
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    ports:
+      - "9092:9092"   # external (from your laptop / services)
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      # ↑ IMPORTANT: advertised as "kafka" not "localhost"
+      #   so other containers can find it by name
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      CLUSTER_ID: "fjyYXOB9ReSxp0E5liSc6w"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ─────────────────────────────────────────────────
+  #  KAFKA UI — visual dashboard to inspect topics,
+  #  messages, consumer groups (huge help for debugging)
+  #  Open: http://localhost:8090
+  # ─────────────────────────────────────────────────
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  # ─────────────────────────────────────────────────
+  #  SPRING BOOT SERVICES
+  #  depends_on with condition: service_healthy means
+  #  the service won't start until its DB is ready.
+  #  Without this, the app starts, can't connect to DB,
+  #  and crashes — a very common beginner frustration.
+  # ─────────────────────────────────────────────────
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: auth_user
+      SPRING_DATASOURCE_PASSWORD: auth_pass
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: "your-256-bit-secret-change-this-in-production-never-hardcode"
+      JWT_EXPIRATION_MS: 86400000   # 24 hours
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  arena-service:
+    build:
+      context: ./arena-service
+      dockerfile: Dockerfile
+    container_name: arena-service
+    ports:
+      - "8082:8082"
+    environment:
+      SERVER_PORT: 8082
+      SPRING_DATASOURCE_URL: jdbc:postgresql://arena-db:5432/arena_db
+      SPRING_DATASOURCE_USERNAME: arena_user
+      SPRING_DATASOURCE_PASSWORD: arena_pass
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      arena-db:
+        condition: service_healthy
+
+  booking-service:
+    build:
+      context: ./booking-service
+      dockerfile: Dockerfile
+    container_name: booking-service
+    ports:
+      - "8083:8083"
+    environment:
+      SERVER_PORT: 8083
+      SPRING_DATASOURCE_URL: jdbc:postgresql://booking-db:5432/booking_db
+      SPRING_DATASOURCE_USERNAME: booking_user
+      SPRING_DATASOURCE_PASSWORD: booking_pass
+      SPRING_PROFILES_ACTIVE: docker
+      ARENA_SERVICE_URL: http://arena-service:8082   # internal service-to-service URL
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      booking-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8084:8084"
+    environment:
+      SERVER_PORT: 8084
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: ai-service
+    ports:
+      - "8085:8085"
+    environment:
+      SERVER_PORT: 8085
+      SPRING_PROFILES_ACTIVE: docker
+      ARENA_SERVICE_URL: http://arena-service:8082
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}   # loaded from .env file, never hardcoded
+    depends_on:
+      - arena-service
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"   # ← this is the ONLY port your frontend/Postman talks to
+    environment:
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: docker
+      AUTH_SERVICE_URL: http://auth-service:8081
+      ARENA_SERVICE_URL: http://arena-service:8082
+      BOOKING_SERVICE_URL: http://booking-service:8083
+      AI_SERVICE_URL: http://ai-service:8085
+    depends_on:
+      - auth-service
+      - arena-service
+      - booking-service
+      - ai-service
+
+# ─────────────────────────────────────────────────
+#  NAMED VOLUMES — data lives here between restarts
+#  docker volume ls         → list all volumes
+#  docker-compose down -v   → delete all (fresh start)
+# ─────────────────────────────────────────────────
+
+volumes:
+  auth-db-data:
+  arena-db-data:
+  booking-db-data:
+  kafka-data:

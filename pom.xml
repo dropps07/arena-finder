@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        WHY A PARENT POM?
+        ─────────────────
+        Instead of repeating Spring Boot version, Java version, and
+        common dependency versions in every service, we define them once
+        here. Each child service just says <parent> and inherits everything.
+        Change a version here → all services pick it up.
+    -->
+
+    <groupId>com.arenafinder</groupId>
+    <artifactId>arena-finder</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Arena Finder - Parent</name>
+
+    <!-- List every service module here. Maven builds them in order. -->
+    <modules>
+        <module>auth-service</module>
+        <module>arena-service</module>
+        <module>booking-service</module>
+        <module>api-gateway</module>
+        <module>notification-service</module>
+        <module>ai-service</module>
+    </modules>
+
+    <!--
+        Spring Boot parent gives us:
+        - Dependency version management (no version tags needed below)
+        - Default Maven plugin config
+        - Auto-configured test runner
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.3</version>
+        <relativePath/>
+    </parent>
+
+    <!-- Global properties inherited by all child modules -->
+    <properties>
+        <java.version>21</java.version>
+        <spring-cloud.version>2023.0.0</spring-cloud.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <!--
+        dependencyManagement ≠ dependencies
+        ─────────────────────────────────────
+        dependencyManagement sets VERSIONS but does NOT add jars to any service.
+        Child services still declare what they need — they just don't need the version.
+        This prevents version conflicts across services.
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- Dependencies every single service gets automatically -->
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+            <!-- Lombok generates boilerplate: @Getter, @Setter, @Builder, etc.
+                 optional=true means it's not passed to downstream projects -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

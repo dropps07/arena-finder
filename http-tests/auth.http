@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════
+#  AUTH SERVICE — HTTP Tests
+#
+#  HOW TO USE (requires REST Client extension):
+#  ────────────────────────────────────────────
+#  1. Open this file in VS Code
+#  2. You'll see "Send Request" appear above each ### block
+#  3. Click it — response appears in a panel on the right
+#
+#  WHY THIS INSTEAD OF POSTMAN?
+#  These files live IN your repo. Your tests are version-controlled,
+#  shareable, and always up to date with your API.
+# ═══════════════════════════════════════════════════════════════
+
+# Shared variables for this file
+@baseUrl = http://localhost:8080
+@authUrl = http://localhost:8081
+
+# After running the login request, copy the token here:
+@token = PASTE_YOUR_TOKEN_HERE
+
+###
+
+# ── Test 1: Health check (no auth needed) ────────────────────
+GET {{authUrl}}/actuator/health
+
+###
+
+# ── Test 2: Login with valid credentials ─────────────────────
+# Expected: 200 OK with a JWT token in the response body
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+###
+
+# ── Test 3: Login with wrong password ────────────────────────
+# Expected: 401 Unauthorized
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "wrongpassword"
+}
+
+###
+
+# ── Test 4: Login with missing field ─────────────────────────
+# Expected: 400 Bad Request (validation error)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "not-a-valid-email"
+}
+
+###
+
+# ── Test 5: Validate a token ─────────────────────────────────
+# Expected: 200 OK with user details
+GET {{baseUrl}}/auth/validate
+Authorization: Bearer {{token}}
+
+###
+
+# ── Test 6: Validate with no token ───────────────────────────
+# Expected: 401 Unauthorized (Gateway blocks it)
+GET {{baseUrl}}/auth/validate
+
+###
