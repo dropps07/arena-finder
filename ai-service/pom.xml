@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>ai-service</artifactId>
-    <n>AI Recommender Service</n>
+    <name>AI Recommender Service</name>
 
     <dependencies>
 

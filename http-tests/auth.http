@@ -17,22 +17,22 @@
 @authUrl = http://localhost:8081
 
 # After running the login request, copy the token here:
-@token = PASTE_YOUR_TOKEN_HERE
+@token = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJwbGF5ZXJAYXJlbmEuY29tIiwicm9sZSI6IlBMQVlFUiIsIm5hbWUiOiJUZXN0IFBsYXllciIsImlhdCI6MTc3NzczODAwNiwiZXhwIjoxNzc3ODI0NDA2fQ.6UFvNgir4DSXkNmkaeTBXFvEJe7JNxoMioczfANdTH9TDEEgfeIfldLK5WzYIDUl
 
 ###
 
 # ── Test 1: Health check (no auth needed) ────────────────────
 GET {{authUrl}}/actuator/health
 
-###
+### Debug login
 
 # ── Test 2: Login with valid credentials ─────────────────────
 # Expected: 200 OK with a JWT token in the response body
-POST {{baseUrl}}/auth/login
+POST {{authUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
+  "email": "player@arena.com",
   "password": "password123"
 }
 
@@ -73,3 +73,6 @@ Authorization: Bearer {{token}}
 GET {{baseUrl}}/auth/validate
 
 ###
+
+### Generate hash
+GET {{authUrl}}/auth/generate-hash

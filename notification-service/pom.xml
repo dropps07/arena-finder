@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>notification-service</artifactId>
-    <n>Notification Service</n>
+    <name>Notification Service</name>
 
     <dependencies>
 

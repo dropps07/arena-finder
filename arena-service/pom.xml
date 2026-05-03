@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>arena-service</artifactId>
-    <n>Arena Service</n>
+    <name>Arena Service</name>
 
     <dependencies>
 

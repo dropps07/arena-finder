@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>booking-service</artifactId>
-    <n>Booking Service</n>
+    <name>Booking Service</name>
 
     <dependencies>
 

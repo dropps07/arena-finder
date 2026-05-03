@@ -1,0 +1,79 @@
+
+# ═══════════════════════════════════════════════════════════════
+#  AUTH SERVICE — Application Configuration
+#
+#  WHY YAML OVER .PROPERTIES?
+#  YAML is hierarchical — grouped config is visually clear.
+#  spring.datasource.url vs spring: datasource: url:
+#  Both work. YAML is standard for Spring Boot projects.
+#
+#  ENVIRONMENT VARIABLES:
+#  ${VAR_NAME:default_value} — uses env var, falls back to default.
+#  ${VAR_NAME} (no default) — REQUIRED. App fails to start if missing.
+#  This is intentional — missing required config should be loud.
+# ═══════════════════════════════════════════════════════════════
+
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/auth_db}
+    username: ${SPRING_DATASOURCE_USERNAME:auth_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:auth_pass}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    # hibernate.ddl-auto controls DB schema management:
+    # create-drop — drops and recreates tables on each restart (dev only)
+    # update      — alters existing tables to match entities (careful in prod)
+    # validate    — validates schema matches entities, fails if not
+    # none        — do nothing (production — use Flyway/Liquibase instead)
+    hibernate:
+      ddl-auto: update
+    # Log the SQL queries Spring generates — useful while learning
+    show-sql: true
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # Seed data — runs data.sql on startup if present
+  sql:
+    init:
+      mode: always
+
+server:
+  port: ${SERVER_PORT:8081}
+
+# JWT configuration
+jwt:
+  secret: ${JWT_SECRET:local-dev-secret-must-be-at-least-32-characters-long}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}  # 24 hours
+
+# Actuator — exposes health check endpoint
+# /actuator/health is used by Docker healthchecks and monitoring tools
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# OpenAPI / Swagger UI configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+# Logging
+logging:
+  level:
+    com.arenafinder: DEBUG      # our code — verbose in dev
+    org.springframework: INFO   # Spring framework — normal
+    org.hibernate.SQL: DEBUG    # show SQL queries
