@@ -142,7 +142,7 @@ arena-finder/
 ## Build Progress
 
 - [x] Phase 1 — Skeleton, Docker Compose, VS Code setup, CI
-- [ ] Phase 2 — Auth Service
+- [x] Phase 2 — Auth Service
 - [ ] Phase 3 — Arena Service
 - [ ] Phase 4 — Booking Service
 - [ ] Phase 5 — API Gateway
