@@ -1,6 +1,13 @@
 package com.arenafinder.auth.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +22,11 @@ import lombok.NoArgsConstructor;
  * you don't want it to silently break your API contract.
  *
  * Lombok annotations (saves ~60 lines of boilerplate):
- *   @Data           — generates getters, setters, equals, hashCode, toString
- *   @Builder        — enables: User.builder().email("x").build()
- *   @NoArgsConstructor — JPA requires a no-arg constructor
- *   @AllArgsConstructor — needed by @Builder
+ * 
+ * @Data — generates getters, setters, equals, hashCode, toString
+ * @Builder — enables: User.builder().email("x").build()
+ * @NoArgsConstructor — JPA requires a no-arg constructor
+ * @AllArgsConstructor — needed by @Builder
  */
 @Entity
 @Table(name = "users")
@@ -53,7 +61,7 @@ public class User {
     private Role role;
 
     public enum Role {
-        PLAYER,       // regular user who books slots
-        ARENA_OWNER   // user who manages arenas
+        PLAYER, // regular user who books slots
+        ARENA_OWNER // user who manages arenas
     }
 }

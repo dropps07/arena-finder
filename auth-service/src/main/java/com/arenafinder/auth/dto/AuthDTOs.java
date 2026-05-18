@@ -11,11 +11,11 @@ import lombok.Data;
  * WHY NOT USE THE User ENTITY DIRECTLY?
  * ──────────────────────────────────────
  * 1. Security: the User entity has a 'password' field. If you accidentally
- *    return the entity, you leak the hashed password in the response.
+ * return the entity, you leak the hashed password in the response.
  * 2. Decoupling: your API contract is separate from your DB schema.
- *    You can rename DB columns without breaking the API.
+ * You can rename DB columns without breaking the API.
  * 3. Validation: @NotBlank etc. belong on the INPUT object (DTO),
- *    not the storage object (Entity).
+ * not the storage object (Entity).
  *
  * This file has multiple DTOs — grouped here since they're small.
  * As they grow, split into separate files.
@@ -79,7 +79,7 @@ public class AuthDTOs {
 
         // Static factory — cleaner than a big constructor call
         public static LoginResponse of(String token, String email,
-                                       String name, String role, long expiresIn) {
+                String name, String role, long expiresIn) {
             LoginResponse r = new LoginResponse();
             r.token = token;
             r.email = email;
@@ -103,7 +103,7 @@ public class AuthDTOs {
         private boolean valid;
 
         public static ValidateResponse of(Long userId, String email,
-                                          String role) {
+                String role) {
             ValidateResponse r = new ValidateResponse();
             r.userId = userId;
             r.email = email;
