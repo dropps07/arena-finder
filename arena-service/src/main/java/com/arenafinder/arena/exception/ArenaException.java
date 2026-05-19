@@ -13,7 +13,7 @@ public class ArenaException {
 
     @ResponseStatus(HttpStatus.FORBIDDEN) // 401: Unauthorized, 403: Forbidden
     public static class UnauthorizedArenaAccessException extends RuntimeException {
-        public UnauthorizedArenaAccessException(Long id) {
+        public UnauthorizedArenaAccessException() {
             super("Not Authorized");
         }
     }

@@ -19,10 +19,10 @@ public class ArenaDTOs {
         private String address;
 
         @NotNull(message = "opening time is req")
-        private String openingTime;
+        private String openTime;
 
         @NotNull(message = "closing time is req")
-        private String closingTime;
+        private String closeTime;
 
         @NotBlank(message = "City is req")
         private String city;
@@ -36,6 +36,9 @@ public class ArenaDTOs {
         @NotNull(message = "Price cant be -ve ")
         @Min(value = 1, message = "price cant be zero")
         private Double price;
+
+        @NotNull(message = "Sport is req")
+        private Arena.Sport sport;
     }
 
     @Data
@@ -52,11 +55,11 @@ public class ArenaDTOs {
 
         private Arena.Sport sport;
 
-        private String openingTime;
+        private String openTime;
 
-        private String closingTime;
+        private String closeTime;
 
-        private Double price;
+        private Double pricePerHour;
     }
 
     @Data
@@ -73,11 +76,11 @@ public class ArenaDTOs {
 
         private Double latitude;
 
-        private Double price;
+        private Double pricePerHour;
 
-        private String openingTime;
+        private String openTime;
 
-        private String closingTime;
+        private String closeTime;
 
         private Arena.Sport sport;
     }
