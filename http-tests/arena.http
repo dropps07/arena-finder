@@ -2,7 +2,7 @@
 #  ARENA SERVICE — HTTP Tests
 # ═══════════════════════════════════════════════════════════════
 
-@baseUrl = http://localhost:8080
+@baseUrl = http://localhost:8082
 @token = PASTE_YOUR_TOKEN_HERE
 
 ###
@@ -33,14 +33,15 @@ GET {{baseUrl}}/arenas/1
 # Expected: 201 Created
 POST {{baseUrl}}/arenas
 Content-Type: application/json
-Authorization: Bearer {{token}}
+X-User-Id: 1
 
 {
   "name": "Champions Turf",
   "address": "Lanka, Varanasi, UP",
+  "city": "Varanasi",
   "latitude": 25.3176,
   "longitude": 82.9739,
-  "sports": ["FOOTBALL", "BADMINTON"],
+  "sport": "FOOTBALL",
   "openTime": "06:00",
   "closeTime": "22:00",
   "pricePerHour": 500

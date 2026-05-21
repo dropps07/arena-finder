@@ -11,10 +11,9 @@ import com.arenafinder.arena.model.Arena;
 public interface ArenaRepository extends JpaRepository<Arena, Long> {
 
     List<Arena> findByCity(String city);
-
     boolean existsByCity(String city);
-
-    List<Arena> findBySport(Arena.Sport sport); // optional means 0 or 1 result, List mean 0>=
+    List<Arena> findBySport(Arena.Sport sport);
+    List<Arena> findByCityAndSport(String city, Arena.Sport sport);
 
     boolean existsBySport(Arena.Sport sport);
 }

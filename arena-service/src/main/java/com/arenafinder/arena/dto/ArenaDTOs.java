@@ -35,7 +35,7 @@ public class ArenaDTOs {
 
         @NotNull(message = "Price cant be -ve ")
         @Min(value = 1, message = "price cant be zero")
-        private Double price;
+        private Double pricePerHour;
 
         @NotNull(message = "Sport is req")
         private Arena.Sport sport;

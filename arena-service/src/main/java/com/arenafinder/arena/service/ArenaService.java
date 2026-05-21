@@ -34,7 +34,7 @@ public class ArenaService {
                 .longitude(request.getLongitude())
                 .openTime(request.getOpenTime())
                 .closeTime(request.getCloseTime())
-                .pricePerHour(request.getPrice())
+                .pricePerHour(request.getPricePerHour())
                 .sport(request.getSport())
                 .ownerId(ownerId)
                 .build();
@@ -63,6 +63,47 @@ public class ArenaService {
         Arena arena = arenaRepository.findById(id)
                 .orElseThrow(() -> new ArenaNotFoundException(id));
         return mapToResponse(arena);
+    }
+
+    // get arenas by sport
+    public List<ArenaResponse> getArenasBySport(Arena.Sport sport) {
+        return arenaRepository.findBySport(sport).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ArenaResponse> getArenasNearby(Double lat, Double lng,
+            Double radiusKm, String sport) {
+        // Haversine formula — finds arenas within radiusKm
+        return arenaRepository.findAll().stream()
+                .filter(arena -> {
+                    double distance = calculateDistance(lat, lng,
+                            arena.getLatitude(), arena.getLongitude());
+                    return distance <= radiusKm;
+                })
+                .filter(arena -> sport == null ||
+                        arena.getSport().name().equals(sport.toUpperCase()))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private double calculateDistance(double lat1, double lng1,
+            double lat2, double lng2) {
+        final int R = 6371; // Earth radius in km
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lngDistance = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                        * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    // get arenas by city and sport
+    public List<ArenaResponse> getArenasByCityAndSport(String city, Arena.Sport sport) {
+        return arenaRepository.findByCityAndSport(city, sport).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     // get all arenas

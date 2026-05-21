@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.arenafinder.arena.dto.ArenaDTOs.ArenaResponse;
 import com.arenafinder.arena.dto.ArenaDTOs.CreateArenaRequest;
 import com.arenafinder.arena.dto.ArenaDTOs.UpdateArenaRequest;
+import com.arenafinder.arena.model.Arena;
 import com.arenafinder.arena.service.ArenaService;
 
 import jakarta.validation.Valid;
@@ -31,8 +33,28 @@ public class ArenaController {
 
     private final ArenaService arenaService;
 
+    @GetMapping("/nearby")
+    public ResponseEntity<List<ArenaResponse>> getArenasNearby(
+            @RequestParam Double lat,
+            @RequestParam Double lng,
+            @RequestParam Double radiusKm,
+            @RequestParam(required = false) String sport) {
+        return ResponseEntity.ok(arenaService.getArenasNearby(lat, lng, radiusKm, sport));
+    }
+
     @GetMapping
-    public ResponseEntity<List<ArenaResponse>> getAllArenas() {
+    public ResponseEntity<List<ArenaResponse>> getAllArenas(
+            @RequestParam(required = false) String sport,
+            @RequestParam(required = false) String city) {
+
+        if (sport != null && city != null) {
+            return ResponseEntity
+                    .ok(arenaService.getArenasByCityAndSport(city, Arena.Sport.valueOf(sport.toUpperCase())));
+        } else if (sport != null) {
+            return ResponseEntity.ok(arenaService.getArenasBySport(Arena.Sport.valueOf(sport)));
+        } else if (city != null) {
+            return ResponseEntity.ok(arenaService.getArenasByCity(city));
+        }
         return ResponseEntity.ok(arenaService.getAllArenas());
     }
 

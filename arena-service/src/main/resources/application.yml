@@ -1,0 +1,42 @@
+spring:
+    application:
+        name: arena-service
+
+    datasource:
+        url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/arena_db}
+        username: ${SPRING_DATASOURCE_USERNAME:arena_user}
+        password: ${SPRING_DATASOURCE_PASSWORD:arena_pass}
+        driver-class-name: org.postgresql.Driver
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        defer-datasource-initialization: true
+        properties:
+            hibernate:
+                format_sql: true
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+    sql:
+        init:
+            mode: always
+
+server:
+    port: ${SERVER_PORT:8082}
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info
+
+springdoc:
+    swagger-ui:
+        path: /swagger-ui.html
+
+logging:
+    level:
+        com.arenafinder: DEBUG
+        org.springframework: INFO
+        org.hibernate.SQL: DEBUG
