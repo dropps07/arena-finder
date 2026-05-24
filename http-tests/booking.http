@@ -1,0 +1,41 @@
+@baseUrl = http://localhost:8083
+@userId = 1
+
+### Health check
+GET {{baseUrl}}/actuator/health
+
+### Create booking
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+X-User-Id: {{userId}}
+
+{
+  "arenaId": 1,
+  "date": "2026-06-01",
+  "startTime": "10:00",
+  "endTime": "12:00"
+}
+
+### Get my bookings
+GET {{baseUrl}}/bookings/my
+X-User-Id: {{userId}}
+
+### Get booking by id
+GET {{baseUrl}}/bookings/1
+X-User-Id: {{userId}}
+
+### Cancel booking
+PUT {{baseUrl}}/bookings/1/cancel
+X-User-Id: {{userId}}
+
+### Double booking (should return 409)
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+X-User-Id: {{userId}}
+
+{
+  "arenaId": 1,
+  "date": "2026-06-01",
+  "startTime": "10:00",
+  "endTime": "12:00"
+}

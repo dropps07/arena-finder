@@ -1,0 +1,30 @@
+@baseUrl = http://localhost:8080
+@token = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJwbGF5ZXJAYXJlbmEuY29tIiwicm9sZSI6IlBMQVlFUiIsIm5hbWUiOiJUZXN0IFBsYXllciIsImlhdCI6MTc3OTY1NzgyMywiZXhwIjoxNzc5NzQ0MjIzfQ.R4l-kOsnT41G8E7qD5OCZfyzIHmPLv8RTbgI9Xgrn40ccXnBpW5SuinNlrrX4Y2t
+
+### 1. Login through gateway
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "player@arena.com",
+  "password": "password123"
+}
+
+### 2. Get arenas WITHOUT token (should return 401)
+GET {{baseUrl}}/arenas
+
+### 3. Get arenas WITH token
+GET {{baseUrl}}/arenas
+Authorization: Bearer {{token}}
+
+### 4. Create booking through gateway (no X-User-Id needed — gateway injects it)
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "arenaId": 1,
+  "date": "2026-06-15",
+  "startTime": "14:00",
+  "endTime": "16:00"
+}

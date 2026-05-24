@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: ai-service
+
+server:
+  port: ${SERVER_PORT:8085}
+
+logging:
+  level:
+    com.arenafinder: DEBUG

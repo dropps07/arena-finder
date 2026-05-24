@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: notification-service
+
+server:
+  port: ${SERVER_PORT:8084}
+
+logging:
+  level:
+    com.arenafinder: DEBUG
