@@ -143,8 +143,8 @@ arena-finder/
 
 - [x] Phase 1 — Skeleton, Docker Compose, VS Code setup, CI
 - [x] Phase 2 — Auth Service
-- [ ] Phase 3 — Arena Service
-- [ ] Phase 4 — Booking Service
-- [ ] Phase 5 — API Gateway
-- [ ] Phase 6 — Kafka + Notifications
-- [ ] Phase 7 — AI Recommender
+- [x] Phase 3 — Arena Service
+- [x] Phase 4 — Booking Service
+- [x] Phase 5 — API Gateway
+- [x] Phase 6 — Kafka + Notifications
+- [x] Phase 7 — AI Recommender
