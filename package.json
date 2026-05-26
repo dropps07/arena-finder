@@ -1,0 +1,11 @@
+{
+  "name": "arena-finder",
+  "version": "1.0.0",
+  "scripts": {
+    "deploy": "gh-pages -d frontend"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}
+

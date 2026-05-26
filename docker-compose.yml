@@ -134,8 +134,8 @@ services:
 
   auth-service:
     build:
-      context: ./auth-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: auth-service/Dockerfile
     container_name: auth-service
     ports:
       - "8081:8081"
@@ -153,8 +153,8 @@ services:
 
   arena-service:
     build:
-      context: ./arena-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: arena-service/Dockerfile
     container_name: arena-service
     ports:
       - "8082:8082"
@@ -170,8 +170,8 @@ services:
 
   booking-service:
     build:
-      context: ./booking-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: booking-service/Dockerfile
     container_name: booking-service
     ports:
       - "8083:8083"
@@ -191,8 +191,8 @@ services:
 
   notification-service:
     build:
-      context: ./notification-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: notification-service/Dockerfile
     container_name: notification-service
     ports:
       - "8084:8084"
@@ -206,8 +206,8 @@ services:
 
   ai-service:
     build:
-      context: ./ai-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ai-service/Dockerfile
     container_name: ai-service
     ports:
       - "8085:8085"
@@ -215,14 +215,14 @@ services:
       SERVER_PORT: 8085
       SPRING_PROFILES_ACTIVE: docker
       ARENA_SERVICE_URL: http://arena-service:8082
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}   # loaded from .env file, never hardcoded
+      GROQ_API_KEY: ${GROQ_API_KEY}   # loaded from .env file, never hardcoded
     depends_on:
       - arena-service
 
   api-gateway:
     build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api-gateway/Dockerfile
     container_name: api-gateway
     ports:
       - "8080:8080"   # ← this is the ONLY port your frontend/Postman talks to
