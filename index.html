@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arena Finder — Premium AI-Powered Sports Arena Booking</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Glow Elements -->
+    <div class="glow-bg-1"></div>
+    <div class="glow-bg-2"></div>
+
+    <!-- Header Navigation -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon"><i class="fa-solid fa-circle-nodes"></i></span>
+            <span class="logo-text">ARENA<span>FINDER</span></span>
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="nav-link active" data-target="home-section"><i class="fa-solid fa-compass"></i> Discover</a>
+            <a href="#" class="nav-link" data-target="ai-section"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant</a>
+            <a href="#" class="nav-link" id="nav-bookings" data-target="bookings-section"><i class="fa-solid fa-calendar-check"></i> My Bookings</a>
+        </nav>
+        <div class="auth-buttons" id="auth-header-container">
+            <button class="btn btn-outline" id="btn-login-open"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</button>
+            <button class="btn btn-primary" id="btn-register-open"><i class="fa-solid fa-user-plus"></i> Sign Up</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+        <!-- Discover / Home Section -->
+        <section id="home-section" class="app-section active">
+            <!-- Hero Block -->
+            <div class="hero-block">
+                <div class="badge-pill">🔥 Intelligent Arena Search</div>
+                <h1>Find & Book Your Next Arena. <br><span class="gradient-text">Instantly.</span></h1>
+                <p>Discover top-tier sports venues powered by AI-driven matchmaking and instant slot bookings.</p>
+            </div>
+
+            <!-- Interactive Search Card -->
+            <div class="search-panel">
+                <div class="search-grid">
+                    <div class="search-field">
+                        <label><i class="fa-solid fa-map-location-dot"></i> City / Location</label>
+                        <input type="text" id="search-city" placeholder="e.g. Varanasi, Mumbai" value="Varanasi">
+                    </div>
+                    <div class="search-field">
+                        <label><i class="fa-solid fa-volleyball"></i> Sport Type</label>
+                        <select id="search-sport">
+                            <option value="">All Sports</option>
+                            <option value="FOOTBALL">Football</option>
+                            <option value="BADMINTON">Badminton</option>
+                            <option value="BASKETBALL">Basketball</option>
+                            <option value="TENNIS">Tennis</option>
+                            <option value="SWIMMING">Swimming</option>
+                        </select>
+                    </div>
+                    <div class="search-field">
+                        <label><i class="fa-solid fa-sliders"></i> Radius (Km)</label>
+                        <div class="range-container">
+                            <input type="range" id="search-radius" min="1" max="50" value="10">
+                            <span id="radius-value">10 Km</span>
+                        </div>
+                    </div>
+                    <div class="search-action">
+                        <button class="btn btn-primary btn-full" id="btn-search">
+                            <i class="fa-solid fa-magnifying-glass"></i> Find Venues
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arenas Showcase -->
+            <div class="section-header">
+                <h2>🏆 Available Arenas <span id="arenas-count-badge" class="count-badge">3</span></h2>
+                <div class="filters-chips">
+                    <button class="chip active" data-filter="all">All</button>
+                    <button class="chip" data-filter="FOOTBALL">Football</button>
+                    <button class="chip" data-filter="BADMINTON">Badminton</button>
+                </div>
+            </div>
+
+            <div class="arenas-grid" id="arenas-container">
+                <!-- Arena Cards will be dynamically injected here -->
+                <div class="loader-container" id="arenas-loader">
+                    <div class="spinner"></div>
+                    <p>Loading premium arenas...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Assistant Section -->
+        <section id="ai-section" class="app-section">
+            <div class="ai-container">
+                <div class="ai-sidebar">
+                    <div class="ai-sidebar-header">
+                        <i class="fa-solid fa-robot"></i>
+                        <div>
+                            <h3>Arena AI Guide</h3>
+                            <p>Conversational Recommender</p>
+                        </div>
+                    </div>
+                    <div class="ai-suggestions">
+                        <h4>💡 Quick Queries</h4>
+                        <button class="suggestion-btn" data-query="Find a football turf in Varanasi under 600 INR/hr">⚽ Football turf in Varanasi under 600 INR</button>
+                        <button class="suggestion-btn" data-query="Where can I play Badminton in Varanasi?">🏸 Badminton courts in Varanasi</button>
+                        <button class="suggestion-btn" data-query="Show me the cheapest arena in Mumbai">🌆 Cheapest arena in Mumbai</button>
+                        <button class="suggestion-btn" data-query="What is Sports Arena Mumbai open timings?">🕒 Sports Arena Mumbai hours</button>
+                    </div>
+                </div>
+                <div class="ai-chatbox">
+                    <div class="chat-header">
+                        <div class="chat-status">
+                            <span class="pulse-indicator"></span>
+                            <span>AI Companion Online</span>
+                        </div>
+                        <span class="chat-model-info">Llama-3-8B</span>
+                    </div>
+                    <div class="chat-messages" id="chat-messages-container">
+                        <!-- Message Bubbles will be injected here -->
+                        <div class="message assistant">
+                            <div class="bubble">
+                                👋 Hey! I am your **Arena Finder AI Assistant**. I can recommend the best venues, check slot prices, or help you find sports activities nearby. What are you looking to play today?
+                            </div>
+                            <span class="message-time">Just now</span>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Ask me anything... (e.g. Find cheap football turfs in Varanasi)">
+                        <button class="btn btn-primary" id="btn-chat-send">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bookings Section -->
+        <section id="bookings-section" class="app-section">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-receipt"></i> Your Booking History</h2>
+                <p class="section-desc">Track and manage all your scheduled sport sessions.</p>
+            </div>
+
+            <div class="bookings-card glass-panel">
+                <div class="table-responsive">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Arena Name</th>
+                                <th>Date & Time</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-tbody">
+                            <!-- Booking rows will be injected here -->
+                            <tr class="empty-state-row">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <i class="fa-solid fa-calendar-xmark"></i>
+                                        <p>Please login to view your booking history.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="booking-modal">
+        <div class="modal-content glass-panel animated">
+            <button class="modal-close" id="btn-close-booking-modal">&times;</button>
+            <div class="modal-header">
+                <h3 id="modal-arena-name">Champions Turf</h3>
+                <span class="sport-badge" id="modal-arena-sport">FOOTBALL</span>
+            </div>
+            <div class="modal-body">
+                <div class="arena-details-row">
+                    <span><i class="fa-solid fa-location-dot"></i> <span id="modal-arena-address">Lanka, Varanasi</span></span>
+                    <span><i class="fa-solid fa-indian-rupee-sign"></i> <span id="modal-arena-price">500</span>/hour</span>
+                </div>
+                
+                <form id="booking-form" class="modal-form">
+                    <div class="form-group">
+                        <label for="booking-date">Select Date</label>
+                        <input type="date" id="booking-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Time Slot</label>
+                        <div class="slots-grid" id="slots-container">
+                            <!-- Slots will be injected dynamically -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-duration">Duration (Hours)</label>
+                        <select id="booking-duration">
+                            <option value="1">1 Hour</option>
+                            <option value="2">2 Hours</option>
+                            <option value="3">3 Hours</option>
+                        </select>
+                    </div>
+                    
+                    <div class="price-summary glass-panel">
+                        <div class="summary-line">
+                            <span>Base Rate:</span>
+                            <span><span id="summary-base-rate">500</span> INR/hr</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>Duration:</span>
+                            <span><span id="summary-duration">1</span> hour(s)</span>
+                        </div>
+                        <div class="summary-line total">
+                            <span>Total Price:</span>
+                            <span><span id="summary-total-price">500</span> INR</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="btn-confirm-booking">
+                        <i class="fa-solid fa-credit-card"></i> Confirm Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content glass-panel animated max-sm">
+            <button class="modal-close" id="btn-close-login-modal">&times;</button>
+            <div class="modal-header center">
+                <i class="fa-solid fa-circle-nodes logo-icon-large"></i>
+                <h3>Welcome Back</h3>
+                <p>Login to secure your favorite arena slots.</p>
+            </div>
+            <div class="modal-body">
+                <form id="login-form" class="modal-form">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" placeholder="you@example.com" required value="user@arenafinder.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="••••••••" required value="password123">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Account
+                    </button>
+                </form>
+                <div class="auth-switch">
+                    Don't have an account? <a href="#" id="link-to-register">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content glass-panel animated max-sm">
+            <button class="modal-close" id="btn-close-register-modal">&times;</button>
+            <div class="modal-header center">
+                <i class="fa-solid fa-circle-nodes logo-icon-large"></i>
+                <h3>Create Account</h3>
+                <p>Register as a Player or Arena Owner</p>
+            </div>
+            <div class="modal-body">
+                <form id="register-form" class="modal-form">
+                    <div class="form-group">
+                        <label for="register-name">Full Name</label>
+                        <input type="text" id="register-name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email Address</label>
+                        <input type="email" id="register-email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" placeholder="Min. 8 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-role">Account Type</label>
+                        <select id="register-role">
+                            <option value="ROLE_USER">Player (Book Arenas)</option>
+                            <option value="ROLE_OWNER">Owner (Host Arenas)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fa-solid fa-user-plus"></i> Register Account
+                    </button>
+                </form>
+                <div class="auth-switch">
+                    Already have an account? <a href="#" id="link-to-login">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Banner / Notifications -->
+    <div class="notification-container" id="notification-container">
+        <!-- Toast alerts pop up here -->
+    </div>
+
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>
