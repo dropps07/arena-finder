@@ -1,4 +1,3 @@
-
 # ═══════════════════════════════════════════════════════════════
 #  CI PIPELINE — runs on every push and pull request to main
 #
@@ -6,13 +5,10 @@
 #  ───────────────
 #  1. Checks out code
 #  2. Sets up Java 21
-#  3. Caches Maven dependencies (so downloads don't repeat every run)
+#  3. Caches Maven dependencies
 #  4. Builds the entire project
 #  5. Runs all unit tests
 #  6. Builds Docker images (verifies Dockerfiles are valid)
-#
-#  WHERE TO SEE RESULTS:
-#  Your GitHub repo → Actions tab → click any run
 # ═══════════════════════════════════════════════════════════════
 
 name: CI Pipeline
@@ -38,10 +34,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Cache Maven local repository.
-      # Key includes the hash of all pom.xml files.
-      # If pom.xml changes (new dependency), cache is invalidated.
-      # Otherwise, cached ~/.m2 is restored — saves 2-3 minutes per run.
+      # Cache Maven dependencies
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
@@ -56,22 +49,26 @@ jobs:
       - name: Run tests
         run: mvn test
 
+      # Docker smoke test
+      # Uses repo root as build context
+      # and service-specific Dockerfiles
       - name: Build Docker images (smoke test)
         run: |
           for service in auth-service arena-service booking-service notification-service ai-service api-gateway; do
             echo "Building $service..."
-            docker build -t arena-finder/$service:ci ./$service
+            docker build \
+              -f $service/Dockerfile \
+              -t arena-finder/$service:ci \
+              .
           done
 
   # ─────────────────────────────────────────────────
   #  CODE QUALITY CHECK
-  #  Checks for common bugs and code smells.
-  #  Fails the build if serious issues are found.
   # ─────────────────────────────────────────────────
   code-quality:
     name: Code Quality
     runs-on: ubuntu-latest
-    needs: build-and-test   # only runs if build passes
+    needs: build-and-test
 
     steps:
       - uses: actions/checkout@v4
@@ -90,5 +87,3 @@ jobs:
 
       - name: Check code formatting (SpotBugs)
         run: mvn spotbugs:check || true
-        # || true means this step won't fail the build yet.
-        # Remove "|| true" once you've fixed all existing warnings.
